@@ -57,7 +57,11 @@ class MockRepository implements CountriesRepository {
     final queryLower = query.toLowerCase();
     
     final filtered = summaries
-        .where((summary) => summary.name.toLowerCase().contains(queryLower))
+        .where((summary) {
+          final nameLower = summary.name.toLowerCase();
+          return nameLower.startsWith(queryLower) || 
+                 nameLower.contains(' $queryLower');
+        })
         .map((summary) {
       return Country(
         id: summary.cca2,

@@ -15,6 +15,7 @@
         "flutter_bloc",
         "freezed_annotation",
         "get_it",
+        "go_router",
         "hive",
         "hive_flutter",
         "injectable",
@@ -312,6 +313,17 @@
       "dependencies": [
         "async",
         "collection",
+        "meta"
+      ]
+    },
+    {
+      "name": "go_router",
+      "version": "13.2.5",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "flutter_web_plugins",
+        "logging",
         "meta"
       ]
     },

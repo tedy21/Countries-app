@@ -5,6 +5,8 @@ import '../../../../core/utils/number_formatter.dart';
 class CountryListItem extends StatelessWidget {
   final Country country;
   final bool isFavorite;
+  final bool showPopulation;
+  final bool showFavoriteIcon;
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteTap;
 
@@ -12,6 +14,8 @@ class CountryListItem extends StatelessWidget {
     super.key,
     required this.country,
     this.isFavorite = false,
+    this.showPopulation = true,
+    this.showFavoriteIcon = true,
     this.onTap,
     this.onFavoriteTap,
   });
@@ -68,24 +72,27 @@ class CountryListItem extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Population: ${country.population != null ? NumberFormatter.formatPopulation(country.population!) : 'N/A'}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
+                  if (showPopulation) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Population: ${country.population != null ? NumberFormatter.formatPopulation(country.population!) : 'N/A'}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
-            IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : Colors.grey.shade400,
+            if (showFavoriteIcon)
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : Colors.grey.shade400,
+                ),
+                onPressed: onFavoriteTap,
               ),
-              onPressed: onFavoriteTap,
-            ),
           ],
         ),
       ),

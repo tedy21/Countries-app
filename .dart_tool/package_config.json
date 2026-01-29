@@ -266,6 +266,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/go_router-13.2.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "graphs",
       "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/graphs-2.3.2",
       "packageUri": "lib/",
