@@ -47,7 +47,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +56,6 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           BlocProvider(
             create: (context) {
-              // TODO: Replace with actual repository implementation
-              // For now, create a mock bloc that will need proper setup
               return CountriesBloc(
                 getCountries: GetCountries(_MockRepository()),
                 getCountryById: GetCountryById(_MockRepository()),
@@ -81,24 +79,22 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Temporary mock repository for UI development
 class _MockRepository implements CountriesRepository {
   @override
   Future<Either<Failure, List<Country>>> getCountries() async {
-    // This will be replaced with actual implementation
     throw UnimplementedError();
   }
-  
+
   @override
   Future<Either<Failure, Country>> getCountryById(String id) async {
     throw UnimplementedError();
   }
-  
+
   @override
   Future<Either<Failure, List<Country>>> searchCountries(String query) async {
     throw UnimplementedError();
   }
-  
+
   @override
   Future<Either<Failure, List<Country>>> getCountriesPaginated({
     required int page,

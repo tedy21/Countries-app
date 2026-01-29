@@ -50,7 +50,6 @@ class _CountriesListPageState extends State<CountriesListPage> {
       ),
       body: Column(
         children: [
-          // Search bar
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
@@ -73,7 +72,6 @@ class _CountriesListPageState extends State<CountriesListPage> {
               onChanged: _onSearchChanged,
             ),
           ),
-          // Countries list
           Expanded(
             child: BlocBuilder<CountriesBloc, CountriesState>(
               builder: (context, state) {
@@ -141,12 +139,8 @@ class _CountriesListPageState extends State<CountriesListPage> {
                       final country = state.countries[index];
                       return CountryListItem(
                         country: country,
-                        onTap: () {
-                          // TODO: Navigate to country details
-                        },
-                        onFavoriteTap: () {
-                          // TODO: Toggle favorite
-                        },
+                        onTap: () {},
+                        onFavoriteTap: () {},
                       );
                     },
                   );

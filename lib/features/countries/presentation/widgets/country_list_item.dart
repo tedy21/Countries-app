@@ -7,7 +7,7 @@ class CountryListItem extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteTap;
-  
+
   const CountryListItem({
     super.key,
     required this.country,
@@ -15,7 +15,7 @@ class CountryListItem extends StatelessWidget {
     this.onTap,
     this.onFavoriteTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -24,7 +24,6 @@ class CountryListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            // Flag
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: country.flag != null
@@ -57,7 +56,6 @@ class CountryListItem extends StatelessWidget {
                     ),
             ),
             const SizedBox(width: 16),
-            // Country name and population
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +79,6 @@ class CountryListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // Heart icon
             IconButton(
               icon: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,

@@ -8,6 +8,9 @@ class Country extends Equatable {
   final String? capital;
   final int? population;
   final double? area;
+  final String? region;
+  final String? subregion;
+  final List<String>? timezones;
   
   const Country({
     required this.id,
@@ -17,6 +20,9 @@ class Country extends Equatable {
     this.capital,
     this.population,
     this.area,
+    this.region,
+    this.subregion,
+    this.timezones,
   });
   
   @override
@@ -28,5 +34,8 @@ class Country extends Equatable {
     capital,
     population,
     area,
+    region,
+    subregion,
+    timezones,
   ];
 }

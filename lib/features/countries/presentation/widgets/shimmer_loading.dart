@@ -16,7 +16,6 @@ class ShimmerLoading extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // Flag shimmer
                 Container(
                   width: 56,
                   height: 40,
@@ -26,7 +25,6 @@ class ShimmerLoading extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Text shimmer
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +50,6 @@ class ShimmerLoading extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Heart icon shimmer
                 Container(
                   width: 24,
                   height: 24,
