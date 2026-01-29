@@ -23,7 +23,6 @@ class CountryDetailPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: BlocBuilder<CountriesBloc, CountriesState>(
             builder: (context, state) {
@@ -40,23 +39,60 @@ class CountryDetailPage extends StatelessWidget {
 
               if (state is CountriesError) {
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        state.message,
-                        style: TextStyle(color: Colors.grey.shade700),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<CountriesBloc>().add(
-                                GetCountryByIdEvent(countryId),
-                              );
-                        },
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.4),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Oops! Something went wrong',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          state.message,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.6),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<CountriesBloc>().add(
+                                  GetCountryByIdEvent(countryId),
+                                );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
@@ -83,7 +119,10 @@ class CountryDetailPage extends StatelessWidget {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   onPressed: () => context.pop(),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -91,39 +130,42 @@ class CountryDetailPage extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   country.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            width: double.infinity,
-            height: 250,
-            margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            decoration: BoxDecoration(
-              color: const Color(0xFF008080),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: country.flag != null
-                  ? Image.network(
-                      country.flag!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child:
-                              Icon(Icons.flag, size: 64, color: Colors.white),
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: Icon(Icons.flag, size: 64, color: Colors.white),
-                    ),
+          Hero(
+            tag: 'country_flag_${country.id}',
+            child: Container(
+              width: double.infinity,
+              height: 250,
+              margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              decoration: BoxDecoration(
+                color: const Color(0xFF008080),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: country.flag != null
+                    ? Image.network(
+                        country.flag!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child:
+                                Icon(Icons.flag, size: 64, color: Colors.white),
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Icon(Icons.flag, size: 64, color: Colors.white),
+                      ),
+              ),
             ),
           ),
           Padding(
@@ -131,38 +173,41 @@ class CountryDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Key Statistics',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 16),
                 _buildStatRow(
+                    context,
                     'Area',
                     country.area != null
                         ? NumberFormatter.formatArea(country.area!)
                         : 'N/A'),
                 const SizedBox(height: 12),
                 _buildStatRow(
+                    context,
                     'Population',
                     country.population != null
                         ? NumberFormatter.formatPopulationForDetail(
                             country.population!)
                         : 'N/A'),
                 const SizedBox(height: 12),
-                _buildStatRow('Region', country.region ?? 'N/A'),
+                _buildStatRow(context, 'Region', country.region ?? 'N/A'),
                 const SizedBox(height: 12),
-                _buildStatRow('Sub Region', country.subregion ?? 'N/A'),
+                _buildStatRow(
+                    context, 'Sub Region', country.subregion ?? 'N/A'),
                 const SizedBox(height: 32),
-                const Text(
+                Text(
                   'Timezone',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -178,25 +223,28 @@ class CountryDetailPage extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
+                          color: Theme.of(context).colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           formattedTimezone,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       );
                     }).toList(),
                   )
                 else
-                  const Text(
+                  Text(
                     'N/A',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.5),
                     ),
                   ),
                 const SizedBox(height: 32),
@@ -208,7 +256,7 @@ class CountryDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatRow(String label, String value) {
+  Widget _buildStatRow(BuildContext context, String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -216,15 +264,15 @@ class CountryDetailPage extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],

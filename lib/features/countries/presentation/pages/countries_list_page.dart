@@ -31,11 +31,8 @@ class _CountriesListPageState extends State<CountriesListPage> {
             'Countries',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
             ),
           ),
-          backgroundColor: Colors.white,
-          elevation: 0,
         ),
         body: Column(
           children: [
@@ -104,11 +101,36 @@ class _CountriesListPageState extends State<CountriesListPage> {
                   if (state is CountriesLoaded) {
                     if (state.countries.isEmpty) {
                       return Center(
-                        child: Text(
-                          'No countries found',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 64,
+                                color: Colors.grey.shade300,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No countries found',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade800,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Try searching with a different term',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -122,27 +144,37 @@ class _CountriesListPageState extends State<CountriesListPage> {
                                 .toSet()
                             : <String>{};
 
-                        return ListView.builder(
-                          itemCount: state.countries.length,
-                          itemBuilder: (context, index) {
-                            final country = state.countries[index];
-                            final isFavorite = favoriteIds.contains(country.id);
-
-                            return CountryListItem(
-                              country: country,
-                              isFavorite: isFavorite,
-                              showPopulation: !_isSearching,
-                              showFavoriteIcon: !_isSearching,
-                              onTap: () {
-                                context.push('/country/${country.id}');
-                              },
-                              onFavoriteTap: () {
-                                context.read<FavoritesBloc>().add(
-                                      ToggleFavoriteEvent(country.id),
-                                    );
-                              },
-                            );
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            context.read<CountriesBloc>().add(
+                                  const GetCountriesEvent(),
+                                );
+                            await Future.delayed(
+                                const Duration(milliseconds: 500));
                           },
+                          child: ListView.builder(
+                            itemCount: state.countries.length,
+                            itemBuilder: (context, index) {
+                              final country = state.countries[index];
+                              final isFavorite =
+                                  favoriteIds.contains(country.id);
+
+                              return CountryListItem(
+                                country: country,
+                                isFavorite: isFavorite,
+                                showPopulation: !_isSearching,
+                                showFavoriteIcon: !_isSearching,
+                                onTap: () {
+                                  context.push('/country/${country.id}');
+                                },
+                                onFavoriteTap: () {
+                                  context.read<FavoritesBloc>().add(
+                                        ToggleFavoriteEvent(country.id),
+                                      );
+                                },
+                              );
+                            },
+                          ),
                         );
                       },
                     );

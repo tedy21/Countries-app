@@ -75,10 +75,10 @@ class FavoriteListItem extends StatelessWidget {
                 children: [
                   Text(
                     country?.name ?? 'Loading...',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (country?.capital != null) ...[
@@ -87,7 +87,10 @@ class FavoriteListItem extends StatelessWidget {
                       'Capital: ${country!.capital!}',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
                       ),
                     ),
                   ] else if (country == null) ...[
@@ -96,7 +99,10 @@ class FavoriteListItem extends StatelessWidget {
                       'Loading...',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade400,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.4),
                       ),
                     ),
                   ],

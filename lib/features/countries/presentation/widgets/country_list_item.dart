@@ -28,36 +28,39 @@ class CountryListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: country.flag != null
-                  ? Container(
-                      width: 56,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(4),
+            Hero(
+              tag: 'country_flag_${country.id}',
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: country.flag != null
+                    ? Container(
+                        width: 56,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Image.network(
+                          country.flag!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.flag, size: 24),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(
+                        width: 56,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Icon(Icons.flag, size: 24),
                       ),
-                      child: Image.network(
-                        country.flag!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.flag, size: 24),
-                          );
-                        },
-                      ),
-                    )
-                  : Container(
-                      width: 56,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Icon(Icons.flag, size: 24),
-                    ),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
