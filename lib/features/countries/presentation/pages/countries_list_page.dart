@@ -1,12 +1,21 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../bloc/countries_bloc.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
 import '../widgets/country_list_item.dart';
 import '../widgets/shimmer_loading.dart';
 
-class CountriesListPage extends StatelessWidget {
+class CountriesListPage extends StatefulWidget {
   const CountriesListPage({super.key});
+
+  @override
+  State<CountriesListPage> createState() => _CountriesListPageState();
+}
+
+class _CountriesListPageState extends State<CountriesListPage> {
+  bool _isSearching = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +39,13 @@ class CountriesListPage extends StatelessWidget {
         ),
         body: Column(
           children: [
-            _SearchField(),
+            _SearchField(
+              onSearchStateChanged: (isSearching) {
+                setState(() {
+                  _isSearching = isSearching;
+                });
+              },
+            ),
             Expanded(
               child: BlocBuilder<CountriesBloc, CountriesState>(
                 builder: (context, state) {
@@ -99,18 +114,35 @@ class CountriesListPage extends StatelessWidget {
                       );
                     }
 
-                    return ListView.builder(
-                      itemCount: state.countries.length,
-                      itemBuilder: (context, index) {
-                        final country = state.countries[index];
-                        return CountryListItem(
-                          country: country,
-                          showPopulation: true,
-                          showFavoriteIcon: true,
-                          onTap: () {
-                            context.push('/country/${country.id}');
+                    return BlocBuilder<FavoritesBloc, FavoritesState>(
+                      builder: (context, favoritesState) {
+                        final favoriteIds = favoritesState is FavoritesLoaded
+                            ? favoritesState.favorites
+                                .map((f) => f.countryId)
+                                .toSet()
+                            : <String>{};
+
+                        return ListView.builder(
+                          itemCount: state.countries.length,
+                          itemBuilder: (context, index) {
+                            final country = state.countries[index];
+                            final isFavorite = favoriteIds.contains(country.id);
+
+                            return CountryListItem(
+                              country: country,
+                              isFavorite: isFavorite,
+                              showPopulation: !_isSearching,
+                              showFavoriteIcon: !_isSearching,
+                              onTap: () {
+                                context.push('/country/${country.id}');
+                              },
+                              onFavoriteTap: () {
+                                context.read<FavoritesBloc>().add(
+                                      ToggleFavoriteEvent(country.id),
+                                    );
+                              },
+                            );
                           },
-                          onFavoriteTap: () {},
                         );
                       },
                     );
@@ -128,6 +160,10 @@ class CountriesListPage extends StatelessWidget {
 }
 
 class _SearchField extends StatefulWidget {
+  final Function(bool) onSearchStateChanged;
+
+  const _SearchField({required this.onSearchStateChanged});
+
   @override
   State<_SearchField> createState() => _SearchFieldState();
 }
@@ -135,6 +171,7 @@ class _SearchField extends StatefulWidget {
 class _SearchFieldState extends State<_SearchField> {
   final TextEditingController _controller = TextEditingController();
   bool _isSearching = false;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -144,26 +181,37 @@ class _SearchFieldState extends State<_SearchField> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _controller.removeListener(_onSearchChanged);
     _controller.dispose();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    final query = _controller.text;
+    final query = _controller.text.trim();
+    final isSearching = query.isNotEmpty;
     setState(() {
-      _isSearching = query.isNotEmpty;
+      _isSearching = isSearching;
     });
+    widget.onSearchStateChanged(isSearching);
+
+    _debounceTimer?.cancel();
 
     if (query.isEmpty) {
       context.read<CountriesBloc>().add(const GetCountriesEvent());
     } else {
-      context.read<CountriesBloc>().add(SearchCountriesEvent(query));
+      _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.read<CountriesBloc>().add(SearchCountriesEvent(query));
+        }
+      });
     }
   }
 
   void _clearSearch() {
+    _debounceTimer?.cancel();
     _controller.clear();
+    widget.onSearchStateChanged(false);
     context.read<CountriesBloc>().add(const GetCountriesEvent());
   }
 
@@ -206,11 +254,6 @@ class _SearchFieldState extends State<_SearchField> {
             vertical: 12,
           ),
         ),
-        onChanged: (value) {
-          setState(() {
-            _isSearching = value.isNotEmpty;
-          });
-        },
       ),
     );
   }

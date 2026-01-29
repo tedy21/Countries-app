@@ -7,4 +7,17 @@ abstract class CountriesLocalDataSource {
   Future<void> clearCache();
 }
 
-class CountriesLocalDataSourceImpl implements CountriesLocalDataSource {}
+class CountriesLocalDataSourceImpl implements CountriesLocalDataSource {
+  @override
+  Future<List<CountryModel>> getCachedCountries() async {
+    throw const CacheException('No cached data available');
+  }
+  
+  @override
+  Future<void> cacheCountries(List<CountryModel> countries) async {
+  }
+  
+  @override
+  Future<void> clearCache() async {
+  }
+}

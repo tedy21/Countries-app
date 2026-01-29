@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../bloc/countries_bloc.dart';
 import '../../domain/entities/country.dart';
 import '../../../../core/utils/number_formatter.dart';
+import '../widgets/detail_shimmer_loading.dart';
 
 class CountryDetailPage extends StatelessWidget {
   final String countryId;
@@ -30,15 +31,11 @@ class CountryDetailPage extends StatelessWidget {
                 context
                     .read<CountriesBloc>()
                     .add(GetCountryByIdEvent(countryId));
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const DetailShimmerLoading();
               }
 
               if (state is CountriesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const DetailShimmerLoading();
               }
 
               if (state is CountriesError) {
@@ -68,9 +65,7 @@ class CountryDetailPage extends StatelessWidget {
                 return _buildDetailContent(context, state.country);
               }
 
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const DetailShimmerLoading();
             },
           ),
         ),

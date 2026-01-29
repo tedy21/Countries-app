@@ -1,31 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import '../bloc/favorites_bloc.dart';
 import '../widgets/favorite_list_item.dart';
+import '../widgets/favorites_shimmer_loading.dart';
 import '../../../countries/domain/entities/country.dart';
-import '../../../countries/data/mock_data/mock_countries_data.dart';
+import '../../../countries/presentation/bloc/countries_bloc.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
-
-  Country? _getCountryById(String countryId) {
-    final details = MockCountriesData.getCountryDetails(countryId);
-    if (details != null) {
-      return Country(
-        id: countryId,
-        name: details.name,
-        code: countryId,
-        flag: details.flags,
-        population: details.population,
-        capital: details.capital.isNotEmpty ? details.capital.first : null,
-        region: details.region,
-        subregion: details.subregion,
-        area: details.area,
-        timezones: details.timezones,
-      );
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +35,11 @@ class FavoritesPage extends StatelessWidget {
           builder: (context, state) {
             if (state is FavoritesInitial) {
               context.read<FavoritesBloc>().add(const GetFavoritesEvent());
-              return const Center(child: CircularProgressIndicator());
+              return const FavoritesShimmerLoading();
             }
 
             if (state is FavoritesLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const FavoritesShimmerLoading();
             }
 
             if (state is FavoritesError) {
@@ -67,7 +50,9 @@ class FavoritesPage extends StatelessWidget {
                     Text(state.message),
                     ElevatedButton(
                       onPressed: () {
-                        context.read<FavoritesBloc>().add(const GetFavoritesEvent());
+                        context
+                            .read<FavoritesBloc>()
+                            .add(const GetFavoritesEvent());
                       },
                       child: const Text('Retry'),
                     ),
@@ -94,14 +79,12 @@ class FavoritesPage extends StatelessWidget {
                 itemCount: state.favorites.length,
                 itemBuilder: (context, index) {
                   final favorite = state.favorites[index];
-                  final country = _getCountryById(favorite.countryId);
-                  return FavoriteListItem(
+                  return _FavoriteItemWithData(
                     favorite: favorite,
-                    country: country,
                     onRemove: () {
                       context.read<FavoritesBloc>().add(
-                        RemoveFavoriteEvent(favorite.countryId),
-                      );
+                            RemoveFavoriteEvent(favorite.countryId),
+                          );
                     },
                   );
                 },
@@ -112,6 +95,129 @@ class FavoritesPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _FavoriteItemWithData extends StatefulWidget {
+  final dynamic favorite;
+  final VoidCallback onRemove;
+
+  const _FavoriteItemWithData({
+    required this.favorite,
+    required this.onRemove,
+  });
+
+  @override
+  State<_FavoriteItemWithData> createState() => _FavoriteItemWithDataState();
+}
+
+class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
+  Country? _country;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCountry();
+    });
+  }
+
+  Future<void> _loadCountry() async {
+    try {
+      final countriesBloc = context.read<CountriesBloc>();
+      final getCountryById = countriesBloc.getCountryById;
+
+      final result = await getCountryById(widget.favorite.countryId);
+
+      if (mounted) {
+        result.fold(
+          (failure) {
+            setState(() {
+              _isLoading = false;
+            });
+          },
+          (country) {
+            setState(() {
+              _country = country;
+              _isLoading = false;
+            });
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading && _country == null) {
+      return Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 100,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 24,
+                height: 24,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return FavoriteListItem(
+      favorite: widget.favorite,
+      country: _country,
+      onRemove: widget.onRemove,
     );
   }
 }

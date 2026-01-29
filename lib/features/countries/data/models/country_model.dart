@@ -15,14 +15,24 @@ class CountryModel extends Country {
   });
   
   factory CountryModel.fromJson(Map<String, dynamic> json) {
+    final nameObj = json['name'] as Map<String, dynamic>?;
+    final flagsObj = json['flags'] as Map<String, dynamic>?;
+    final cca2 = json['cca2'] as String? ?? '';
+    
     return CountryModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      code: json['code']?.toString() ?? '',
-      flag: json['flag']?.toString(),
-      capital: json['capital']?.toString(),
+      id: cca2,
+      name: nameObj?['common'] as String? ?? '',
+      code: cca2,
+      flag: flagsObj?['png'] as String?,
+      capital: json['capital'] is List 
+          ? (json['capital'] as List).isNotEmpty 
+              ? (json['capital'] as List).first.toString()
+              : null
+          : json['capital']?.toString(),
       population: json['population'] as int?,
-      area: json['area'] as double?,
+      area: json['area'] is int 
+          ? (json['area'] as int).toDouble()
+          : json['area'] as double?,
       region: json['region']?.toString(),
       subregion: json['subregion']?.toString(),
       timezones: json['timezones'] != null 

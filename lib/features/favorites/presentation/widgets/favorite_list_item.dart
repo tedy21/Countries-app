@@ -7,7 +7,7 @@ class FavoriteListItem extends StatelessWidget {
   final Country? country;
   final VoidCallback? onRemove;
   final VoidCallback? onTap;
-  
+
   const FavoriteListItem({
     super.key,
     required this.favorite,
@@ -15,7 +15,7 @@ class FavoriteListItem extends StatelessWidget {
     this.onRemove,
     this.onTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -24,36 +24,49 @@ class FavoriteListItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: country?.flag != null
-                  ? Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Image.network(
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: country?.flag != null
+                    ? Image.network(
                         country!.flag!,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey.shade200,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey.shade200,
-                            child: const Icon(Icons.flag, size: 24),
+                            child: const Icon(Icons.flag,
+                                size: 24, color: Colors.grey),
                           );
                         },
-                      ),
-                    )
-                  : Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
+                      )
+                    : Container(
                         color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(4),
+                        child: const Icon(Icons.flag,
+                            size: 24, color: Colors.grey),
                       ),
-                      child: const Icon(Icons.flag, size: 24),
-                    ),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -61,10 +74,10 @@ class FavoriteListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    country?.name ?? 'Country ${favorite.countryId}',
+                    country?.name ?? 'Loading...',
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
@@ -75,6 +88,15 @@ class FavoriteListItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ] else if (country == null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Loading...',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade400,
                       ),
                     ),
                   ],
