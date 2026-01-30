@@ -1,16 +1,40 @@
-# countries_app
+# Countries App
 
-A new Flutter project.
+A Flutter app to explore countries around the world. Browse, search, and save your favorite countries.
 
-## Getting Started
+## Quick Start
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+flutter pub get
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+flutter run
+
+
+
+
+
+**State Management:** BLoC pattern for predictable state handling and easier testing.
+
+**Architecture:** Clean architecture with separate layers for UI, business logic, and data. Keeps things organized and maintainable.
+
+**Dependency Injection:** Using `get_it` to manage dependencies without tight coupling.
+
+**Routing:** `go_router` for type-safe navigation and deep linking.
+
+**Data Models:** `freezed` generates immutable models with less boilerplate.
+
+**Caching:** HTTP caching with `dio_cache_interceptor` and Hive for offline support.
+
+**Local Storage:** `SharedPreferences` for saving your favorite countries.
+
+## Features
+
+- Browse all countries with search
+- View detailed country information
+- Save favorites 
+- Works offline with cached data
+- Dark theme support
+- Responsive design for tablets
+- Pull-to-refresh
+- Smooth animations
