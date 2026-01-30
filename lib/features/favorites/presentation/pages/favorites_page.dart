@@ -49,7 +49,7 @@ class FavoritesPage extends StatelessWidget {
                       Icon(
                         Icons.error_outline,
                         size: 64,
-                        color: Colors.grey.shade400,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -57,7 +57,7 @@ class FavoritesPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -66,7 +66,7 @@ class FavoritesPage extends StatelessWidget {
                         state.message,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -78,8 +78,8 @@ class FavoritesPage extends StatelessWidget {
                               .add(const GetFavoritesEvent());
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -104,7 +104,7 @@ class FavoritesPage extends StatelessWidget {
                         Icon(
                           Icons.favorite_border,
                           size: 64,
-                          color: Colors.grey.shade300,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -112,16 +112,16 @@ class FavoritesPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Start adding countries to your favorites\nby tapping the heart icon',
+                          'Start adding countries to your favorites by tapping the heart icon',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -131,21 +131,47 @@ class FavoritesPage extends StatelessWidget {
                 );
               }
 
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: state.favorites.length,
-                itemBuilder: (context, index) {
-                  final favorite = state.favorites[index];
-                  return _FavoriteItemWithData(
-                    favorite: favorite,
-                    onRemove: () {
-                      context.read<FavoritesBloc>().add(
-                            RemoveFavoriteEvent(favorite.countryId),
-                          );
-                    },
-                  );
-                },
-              );
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isTablet = screenWidth >= 600;
+              final crossAxisCount = isTablet ? (screenWidth ~/ 300).clamp(2, 4) : 1;
+
+              return isTablet
+                  ? GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        childAspectRatio: 2.5,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: state.favorites.length,
+                      itemBuilder: (context, index) {
+                        final favorite = state.favorites[index];
+                        return _FavoriteItemWithData(
+                          favorite: favorite,
+                          onRemove: () {
+                            context.read<FavoritesBloc>().add(
+                                  RemoveFavoriteEvent(favorite.countryId),
+                                );
+                          },
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: state.favorites.length,
+                      itemBuilder: (context, index) {
+                        final favorite = state.favorites[index];
+                        return _FavoriteItemWithData(
+                          favorite: favorite,
+                          onRemove: () {
+                            context.read<FavoritesBloc>().add(
+                                  RemoveFavoriteEvent(favorite.countryId),
+                                );
+                          },
+                        );
+                      },
+                    );
             }
 
             return const SizedBox.shrink();
@@ -215,9 +241,16 @@ class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading && _country == null) {
+      final baseColor = Theme.of(context).brightness == Brightness.light
+          ? Colors.grey.shade300
+          : Colors.grey.shade700;
+      final highlightColor = Theme.of(context).brightness == Brightness.light
+          ? Colors.grey.shade100
+          : Colors.grey.shade600;
+      
       return Shimmer.fromColors(
-        baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
+        baseColor: baseColor,
+        highlightColor: highlightColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -226,9 +259,11 @@ class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -240,7 +275,7 @@ class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
                       width: 120,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -249,7 +284,7 @@ class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
                       width: 100,
                       height: 14,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -260,8 +295,8 @@ class _FavoriteItemWithDataState extends State<_FavoriteItemWithData> {
               Container(
                 width: 24,
                 height: 24,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
               ),

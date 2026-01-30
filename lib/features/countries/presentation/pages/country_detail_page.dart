@@ -22,91 +22,112 @@ class CountryDetailPage extends StatelessWidget {
           context.read<CountriesBloc>().add(GetCountryByIdEvent(countryId));
         }
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: BlocBuilder<CountriesBloc, CountriesState>(
-            builder: (context, state) {
-              if (state is CountriesInitial) {
-                context
-                    .read<CountriesBloc>()
-                    .add(GetCountryByIdEvent(countryId));
-                return const DetailShimmerLoading();
-              }
+      child: BlocBuilder<CountriesBloc, CountriesState>(
+        builder: (context, state) {
+          String? countryName;
+          if (state is CountryDetailLoaded) {
+            countryName = state.country.name;
+          }
 
-              if (state is CountriesLoading) {
-                return const DetailShimmerLoading();
-              }
-
-              if (state is CountriesError) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.4),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Oops! Something went wrong',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          state.message,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.6),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () {
-                            context.read<CountriesBloc>().add(
-                                  GetCountryByIdEvent(countryId),
-                                );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              if (state is CountryDetailLoaded) {
-                return _buildDetailContent(context, state.country);
-              }
-
-              return const DetailShimmerLoading();
-            },
-          ),
-        ),
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onPressed: () => context.pop(),
+              ),
+              title: Text(
+                countryName ?? 'Country',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              centerTitle: false,
+              backgroundColor: Theme.of(context).colorScheme.background,
+              elevation: 0,
+            ),
+            body: SafeArea(
+              child: _buildBody(context, state),
+            ),
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildBody(BuildContext context, CountriesState state) {
+    if (state is CountriesInitial) {
+      context.read<CountriesBloc>().add(GetCountryByIdEvent(countryId));
+      return const DetailShimmerLoading();
+    }
+
+    if (state is CountriesLoading) {
+      return const DetailShimmerLoading();
+    }
+
+    if (state is CountriesError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Oops! Something went wrong',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                state.message,
+                style: TextStyle(
+                  fontSize: 14,
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<CountriesBloc>().add(
+                        GetCountryByIdEvent(countryId),
+                      );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (state is CountryDetailLoaded) {
+      return _buildDetailContent(context, state.country);
+    }
+
+    return const DetailShimmerLoading();
   }
 
   Widget _buildDetailContent(BuildContext context, Country country) {
@@ -114,37 +135,12 @@ class CountryDetailPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  onPressed: () => context.pop(),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  country.name,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
           Hero(
             tag: 'country_flag_${country.id}',
             child: Container(
               width: double.infinity,
               height: 250,
-              margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
               decoration: BoxDecoration(
                 color: const Color(0xFF008080),
                 borderRadius: BorderRadius.circular(12),
@@ -169,7 +165,7 @@ class CountryDetailPage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -223,8 +219,21 @@ class CountryDetailPage extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Colors.grey.shade100
+                                  : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.grey.shade300
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
                         child: Text(
                           formattedTimezone,
@@ -247,7 +256,6 @@ class CountryDetailPage extends StatelessWidget {
                           .withOpacity(0.5),
                     ),
                   ),
-                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -286,6 +294,9 @@ class CountryDetailPage extends StatelessWidget {
       final sign = match.group(1)!;
       final hours = int.parse(match.group(2)!);
       return 'UTC $sign${hours.toString().padLeft(2, '0')}';
+    }
+    if (timezone.startsWith('UTC')) {
+      return timezone.replaceAll(':', '').replaceAll('00', '');
     }
     return timezone;
   }

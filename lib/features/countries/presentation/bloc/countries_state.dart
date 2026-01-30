@@ -17,11 +17,14 @@ class CountriesLoading extends CountriesState {
 
 class CountriesLoaded extends CountriesState {
   final List<Country> countries;
+  final SortType? currentSort;
   
-  const CountriesLoaded(this.countries);
+  const CountriesLoaded(this.countries, {this.currentSort});
   
   @override
-  List<Object> get props => [countries];
+  List<Object> get props => currentSort != null 
+      ? [countries, currentSort!] 
+      : [countries];
 }
 
 class CountryDetailLoaded extends CountriesState {

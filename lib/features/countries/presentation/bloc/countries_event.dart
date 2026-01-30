@@ -28,3 +28,14 @@ class SearchCountriesEvent extends CountriesEvent {
   @override
   List<Object> get props => [query];
 }
+
+enum SortType { name, population }
+
+class SortCountriesEvent extends CountriesEvent {
+  final SortType sortType;
+  
+  const SortCountriesEvent(this.sortType);
+  
+  @override
+  List<Object> get props => [sortType];
+}

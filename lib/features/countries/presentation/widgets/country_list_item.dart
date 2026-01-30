@@ -22,6 +22,113 @@ class CountryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    
+    if (isTablet) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                tag: 'country_flag_${country.id}',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: country.flag != null
+                      ? Container(
+                          width: double.infinity,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Image.network(
+                            country.flag!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: Icon(
+                                  Icons.flag,
+                                  size: 48,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.flag,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      country.name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (showFavoriteIcon)
+                    IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      ),
+                      onPressed: onFavoriteTap,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                ],
+              ),
+              if (showPopulation) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Population: ${country.population != null ? NumberFormatter.formatPopulation(country.population!) : 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+    
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -37,7 +144,9 @@ class CountryListItem extends StatelessWidget {
                         width: 56,
                         height: 40,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                          ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Image.network(
@@ -45,8 +154,12 @@ class CountryListItem extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: Colors.grey.shade200,
-                              child: const Icon(Icons.flag, size: 24),
+                              color: Theme.of(context).colorScheme.surface,
+                              child: Icon(
+                                Icons.flag,
+                                size: 24,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                              ),
                             );
                           },
                         ),
@@ -55,10 +168,14 @@ class CountryListItem extends StatelessWidget {
                         width: 56,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Icon(Icons.flag, size: 24),
+                        child: Icon(
+                          Icons.flag,
+                          size: 24,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        ),
                       ),
               ),
             ),
@@ -69,10 +186,10 @@ class CountryListItem extends StatelessWidget {
                 children: [
                   Text(
                     country.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (showPopulation) ...[
@@ -81,7 +198,7 @@ class CountryListItem extends StatelessWidget {
                       'Population: ${country.population != null ? NumberFormatter.formatPopulation(country.population!) : 'N/A'}',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -92,7 +209,7 @@ class CountryListItem extends StatelessWidget {
               IconButton(
                 icon: Icon(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.red : Colors.grey.shade400,
+                  color: isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 ),
                 onPressed: onFavoriteTap,
               ),

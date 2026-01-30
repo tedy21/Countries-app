@@ -24,16 +24,43 @@ class CountriesRepositoryImpl implements CountriesRepository {
       try {
         final remoteCountries = await remoteDataSource.getCountries();
         final countries = remoteCountries.map((model) => model.toEntity()).toList();
+        await localDataSource.cacheCountries(remoteCountries);
         return Right(countries);
       } on ServerException catch (e) {
+        try {
+          final cachedCountries = await localDataSource.getCachedCountries();
+          if (cachedCountries.isNotEmpty) {
+            return Right(cachedCountries.map((model) => model.toEntity()).toList());
+          }
+        } catch (_) {}
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {
+        try {
+          final cachedCountries = await localDataSource.getCachedCountries();
+          if (cachedCountries.isNotEmpty) {
+            return Right(cachedCountries.map((model) => model.toEntity()).toList());
+          }
+        } catch (_) {}
         return Left(NetworkFailure(e.message));
       } catch (e) {
+        try {
+          final cachedCountries = await localDataSource.getCachedCountries();
+          if (cachedCountries.isNotEmpty) {
+            return Right(cachedCountries.map((model) => model.toEntity()).toList());
+          }
+        } catch (_) {}
         return Left(UnknownFailure('Unexpected error: ${e.toString()}'));
       }
     } else {
-      return const Left(NetworkFailure('No internet connection'));
+      try {
+        final cachedCountries = await localDataSource.getCachedCountries();
+        if (cachedCountries.isNotEmpty) {
+          return Right(cachedCountries.map((model) => model.toEntity()).toList());
+        }
+      } catch (e) {
+        return Left(CacheFailure('No cached data available: ${e.toString()}'));
+      }
+      return const Left(NetworkFailure('No internet connection and no cached data'));
     }
   }
   
@@ -42,16 +69,43 @@ class CountriesRepositoryImpl implements CountriesRepository {
     if (await networkInfo.isConnected) {
       try {
         final remoteCountry = await remoteDataSource.getCountryById(id);
+        await localDataSource.cacheCountry(remoteCountry);
         return Right(remoteCountry.toEntity());
       } on ServerException catch (e) {
+        try {
+          final cachedCountry = await localDataSource.getCachedCountryById(id);
+          if (cachedCountry != null) {
+            return Right(cachedCountry.toEntity());
+          }
+        } catch (_) {}
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {
+        try {
+          final cachedCountry = await localDataSource.getCachedCountryById(id);
+          if (cachedCountry != null) {
+            return Right(cachedCountry.toEntity());
+          }
+        } catch (_) {}
         return Left(NetworkFailure(e.message));
       } catch (e) {
+        try {
+          final cachedCountry = await localDataSource.getCachedCountryById(id);
+          if (cachedCountry != null) {
+            return Right(cachedCountry.toEntity());
+          }
+        } catch (_) {}
         return Left(UnknownFailure('Unexpected error: ${e.toString()}'));
       }
     } else {
-      return const Left(NetworkFailure('No internet connection'));
+      try {
+        final cachedCountry = await localDataSource.getCachedCountryById(id);
+        if (cachedCountry != null) {
+          return Right(cachedCountry.toEntity());
+        }
+      } catch (e) {
+        return Left(CacheFailure('No cached data available: ${e.toString()}'));
+      }
+      return const Left(NetworkFailure('No internet connection and no cached data'));
     }
   }
   

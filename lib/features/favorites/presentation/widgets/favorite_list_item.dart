@@ -28,7 +28,9 @@ class FavoriteListItem extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                ),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: ClipRRect(
@@ -40,7 +42,7 @@ class FavoriteListItem extends StatelessWidget {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: Colors.grey.shade200,
+                            color: Theme.of(context).colorScheme.surface,
                             child: Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
@@ -55,16 +57,22 @@ class FavoriteListItem extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.flag,
-                                size: 24, color: Colors.grey),
+                            color: Theme.of(context).colorScheme.surface,
+                            child: Icon(
+                              Icons.flag,
+                              size: 24,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                            ),
                           );
                         },
                       )
                     : Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.flag,
-                            size: 24, color: Colors.grey),
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Icon(
+                          Icons.flag,
+                          size: 24,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        ),
                       ),
               ),
             ),
@@ -111,8 +119,8 @@ class FavoriteListItem extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(
-                Icons.favorite_border,
-                color: Colors.grey.shade400,
+                Icons.favorite,
+                color: Colors.red,
               ),
               onPressed: onRemove,
             ),

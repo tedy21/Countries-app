@@ -22,11 +22,30 @@ class CountriesRemoteDataSourceImpl implements CountriesRemoteDataSource {
         queryParameters: {'fields': 'name,flags,population,cca2'},
       );
       
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data.map((json) => CountryModel.fromJson(json as Map<String, dynamic>)).toList();
+      if (response.statusCode == 200 || response.statusCode == 304) {
+        try {
+          final List<dynamic> data = response.data;
+          if (data.isEmpty) {
+            return [];
+          }
+          return data.map((json) {
+            try {
+              return CountryModel.fromJson(json as Map<String, dynamic>);
+            } catch (e) {
+              throw ServerException('Error parsing country data: ${e.toString()}');
+            }
+          }).toList();
+        } catch (e) {
+          if (e is ServerException || e is NetworkException) {
+            rethrow;
+          }
+          throw ServerException('Error parsing response: ${e.toString()}');
+        }
       } else {
-        throw ServerException('Failed to fetch countries', statusCode: response.statusCode);
+        throw ServerException(
+          'Failed to fetch countries. Status code: ${response.statusCode}',
+          statusCode: response.statusCode,
+        );
       }
     } on ServerException {
       rethrow;
@@ -36,7 +55,7 @@ class CountriesRemoteDataSourceImpl implements CountriesRemoteDataSource {
       if (e is ServerException || e is NetworkException) {
         rethrow;
       }
-      throw ServerException('Unexpected error: ${e.toString()}');
+      throw ServerException('Unexpected error while fetching countries: ${e.toString()}');
     }
   }
   
@@ -50,7 +69,7 @@ class CountriesRemoteDataSourceImpl implements CountriesRemoteDataSource {
         },
       );
       
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 304) {
         return CountryModel.fromJson(response.data as Map<String, dynamic>);
       } else {
         throw ServerException('Country not found', statusCode: response.statusCode);
@@ -75,7 +94,7 @@ class CountriesRemoteDataSourceImpl implements CountriesRemoteDataSource {
         queryParameters: {'fields': 'name,flags,population,cca2'},
       );
       
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 304) {
         final List<dynamic> data = response.data;
         if (data.isEmpty) {
           return [];

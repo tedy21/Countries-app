@@ -10,6 +10,8 @@
         "connectivity_plus",
         "dartz",
         "dio",
+        "dio_cache_interceptor",
+        "dio_cache_interceptor_hive_store",
         "equatable",
         "flutter",
         "flutter_bloc",
@@ -22,7 +24,6 @@
         "intl",
         "json_annotation",
         "logger",
-        "retrofit",
         "shared_preferences",
         "shimmer"
       ],
@@ -33,8 +34,7 @@
         "freezed",
         "hive_generator",
         "injectable_generator",
-        "json_serializable",
-        "retrofit_generator"
+        "json_serializable"
       ]
     },
     {
@@ -79,22 +79,6 @@
         "pubspec_parse",
         "source_gen",
         "source_helper"
-      ]
-    },
-    {
-      "name": "retrofit_generator",
-      "version": "8.2.1",
-      "dependencies": [
-        "analyzer",
-        "build",
-        "built_collection",
-        "code_builder",
-        "dart_style",
-        "dio",
-        "protobuf",
-        "retrofit",
-        "source_gen",
-        "tuple"
       ]
     },
     {
@@ -279,11 +263,20 @@
       ]
     },
     {
-      "name": "retrofit",
-      "version": "4.9.2",
+      "name": "dio_cache_interceptor_hive_store",
+      "version": "3.2.2",
+      "dependencies": [
+        "dio_cache_interceptor",
+        "hive"
+      ]
+    },
+    {
+      "name": "dio_cache_interceptor",
+      "version": "3.5.1",
       "dependencies": [
         "dio",
-        "meta"
+        "string_scanner",
+        "uuid"
       ]
     },
     {
@@ -484,17 +477,8 @@
       ]
     },
     {
-      "name": "protobuf",
-      "version": "3.1.0",
-      "dependencies": [
-        "collection",
-        "fixnum",
-        "meta"
-      ]
-    },
-    {
-      "name": "tuple",
-      "version": "2.0.2",
+      "name": "recase",
+      "version": "4.1.0",
       "dependencies": []
     },
     {
@@ -507,16 +491,6 @@
         "matcher",
         "meta"
       ]
-    },
-    {
-      "name": "built_collection",
-      "version": "5.1.1",
-      "dependencies": []
-    },
-    {
-      "name": "recase",
-      "version": "4.1.0",
-      "dependencies": []
     },
     {
       "name": "glob",
@@ -985,6 +959,15 @@
       ]
     },
     {
+      "name": "uuid",
+      "version": "4.5.2",
+      "dependencies": [
+        "crypto",
+        "fixnum",
+        "meta"
+      ]
+    },
+    {
       "name": "dio_web_adapter",
       "version": "2.1.1",
       "dependencies": [
@@ -1057,6 +1040,11 @@
       ]
     },
     {
+      "name": "built_collection",
+      "version": "5.1.1",
+      "dependencies": []
+    },
+    {
       "name": "checked_yaml",
       "version": "2.0.4",
       "dependencies": [
@@ -1064,11 +1052,6 @@
         "source_span",
         "yaml"
       ]
-    },
-    {
-      "name": "fixnum",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "file",
@@ -1154,6 +1137,11 @@
         "flutter",
         "path_provider_platform_interface"
       ]
+    },
+    {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "dependencies": []
     },
     {
       "name": "nested",

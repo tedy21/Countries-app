@@ -8,53 +8,16 @@ import '../../features/countries/presentation/bloc/countries_bloc.dart';
 import '../../features/countries/domain/usecases/get_countries.dart';
 import '../../features/countries/domain/usecases/get_country_by_id.dart';
 import '../../features/countries/domain/usecases/search_countries.dart';
-import '../../features/countries/data/repositories/countries_repository_impl.dart';
-import '../../features/countries/data/datasources/countries_remote_datasource.dart';
-import '../../features/countries/data/datasources/countries_local_datasource.dart';
-import '../../core/network/api_client.dart';
-import '../../core/network/network_info.dart';
 import '../../features/favorites/presentation/bloc/favorites_bloc.dart';
 import '../../features/favorites/domain/usecases/get_favorites.dart';
 import '../../features/favorites/domain/usecases/add_favorite.dart';
 import '../../features/favorites/domain/usecases/remove_favorite.dart';
 import '../../features/favorites/domain/usecases/toggle_favorite.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../features/favorites/data/repositories/favorites_repository_impl.dart';
-import '../../features/favorites/data/datasources/favorites_local_datasource.dart';
+import '../injection/injection.dart';
 import '../widgets/bottom_navigation.dart';
 
 class AppRouter {
-  static final ApiClient _apiClient = ApiClient();
-  static final NetworkInfo _networkInfo = NetworkInfoImpl();
-  static final CountriesRemoteDataSource _remoteDataSource =
-      CountriesRemoteDataSourceImpl(apiClient: _apiClient);
-  static final CountriesLocalDataSource _localDataSource =
-      CountriesLocalDataSourceImpl();
-  static final CountriesRepositoryImpl _countriesRepository =
-      CountriesRepositoryImpl(
-    remoteDataSource: _remoteDataSource,
-    localDataSource: _localDataSource,
-    networkInfo: _networkInfo,
-  );
-
-  static FavoritesRepositoryImpl? _favoritesRepository;
-
-  static void initialize(SharedPreferences sharedPreferences) {
-    final favoritesLocalDataSource = FavoritesLocalDataSourceImpl(
-      sharedPreferences: sharedPreferences,
-    );
-    _favoritesRepository = FavoritesRepositoryImpl(
-      localDataSource: favoritesLocalDataSource,
-    );
-  }
-
-  static FavoritesRepositoryImpl get _favoritesRepo {
-    if (_favoritesRepository == null) {
-      throw StateError(
-          'AppRouter not initialized. Call AppRouter.initialize() first.');
-    }
-    return _favoritesRepository!;
-  }
+  static void initialize() {}
 
   static final GoRouter router = GoRouter(
     initialLocation: '/home',
@@ -66,49 +29,11 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (context, state) => MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => CountriesBloc(
-                    getCountries: GetCountries(_countriesRepository),
-                    getCountryById: GetCountryById(_countriesRepository),
-                    searchCountries: SearchCountries(_countriesRepository),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) => FavoritesBloc(
-                    getFavorites: GetFavorites(_favoritesRepo),
-                    addFavorite: AddFavorite(_favoritesRepo),
-                    removeFavorite: RemoveFavorite(_favoritesRepo),
-                    toggleFavorite: ToggleFavorite(_favoritesRepo),
-                  )..add(const GetFavoritesEvent()),
-                ),
-              ],
-              child: const CountriesListPage(),
-            ),
+            builder: (context, state) => const CountriesListPage(),
           ),
           GoRoute(
             path: '/favorites',
-            builder: (context, state) => MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => FavoritesBloc(
-                    getFavorites: GetFavorites(_favoritesRepo),
-                    addFavorite: AddFavorite(_favoritesRepo),
-                    removeFavorite: RemoveFavorite(_favoritesRepo),
-                    toggleFavorite: ToggleFavorite(_favoritesRepo),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) => CountriesBloc(
-                    getCountries: GetCountries(_countriesRepository),
-                    getCountryById: GetCountryById(_countriesRepository),
-                    searchCountries: SearchCountries(_countriesRepository),
-                  ),
-                ),
-              ],
-              child: const FavoritesPage(),
-            ),
+            builder: (context, state) => const FavoritesPage(),
           ),
         ],
       ),
@@ -118,9 +43,9 @@ class AppRouter {
           final countryId = state.pathParameters['id']!;
           return BlocProvider(
             create: (context) => CountriesBloc(
-              getCountries: GetCountries(_countriesRepository),
-              getCountryById: GetCountryById(_countriesRepository),
-              searchCountries: SearchCountries(_countriesRepository),
+              getCountries: getIt<GetCountries>(),
+              getCountryById: getIt<GetCountryById>(),
+              searchCountries: getIt<SearchCountries>(),
             ),
             child: CountryDetailPage(countryId: countryId),
           );
@@ -130,10 +55,53 @@ class AppRouter {
   );
 }
 
-class _MainShell extends StatelessWidget {
+class _MainShell extends StatefulWidget {
   final Widget child;
 
   const _MainShell({required this.child});
+
+  @override
+  State<_MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<_MainShell> {
+  late final CountriesBloc _countriesBloc;
+  late final FavoritesBloc _favoritesBloc;
+  bool _hasInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _countriesBloc = CountriesBloc(
+      getCountries: getIt<GetCountries>(),
+      getCountryById: getIt<GetCountryById>(),
+      searchCountries: getIt<SearchCountries>(),
+    );
+    _favoritesBloc = FavoritesBloc(
+      getFavorites: getIt<GetFavorites>(),
+      addFavorite: getIt<AddFavorite>(),
+      removeFavorite: getIt<RemoveFavorite>(),
+      toggleFavorite: getIt<ToggleFavorite>(),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Initialize data only once when the shell is first built
+    if (!_hasInitialized) {
+      _hasInitialized = true;
+      _countriesBloc.add(const GetCountriesEvent());
+      _favoritesBloc.add(const GetFavoritesEvent());
+    }
+  }
+
+  @override
+  void dispose() {
+    _countriesBloc.close();
+    _favoritesBloc.close();
+    super.dispose();
+  }
 
   int _getCurrentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
@@ -154,11 +122,17 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentIndex = _getCurrentIndex(context);
 
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: AppBottomNavigation(
-        currentIndex: currentIndex,
-        onTap: (index) => _onTabTapped(index, context),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _countriesBloc),
+        BlocProvider.value(value: _favoritesBloc),
+      ],
+      child: Scaffold(
+        body: widget.child,
+        bottomNavigationBar: AppBottomNavigation(
+          currentIndex: currentIndex,
+          onTap: (index) => _onTabTapped(index, context),
+        ),
       ),
     );
   }

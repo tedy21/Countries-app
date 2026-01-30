@@ -21,6 +21,7 @@ class CountriesBloc extends Bloc<CountriesEvent, CountriesState> {
     on<GetCountriesEvent>(_onGetCountries);
     on<GetCountryByIdEvent>(_onGetCountryById);
     on<SearchCountriesEvent>(_onSearchCountries);
+    on<SortCountriesEvent>(_onSortCountries);
   }
   
   Future<void> _onGetCountries(
@@ -57,5 +58,31 @@ class CountriesBloc extends Bloc<CountriesEvent, CountriesState> {
       (failure) => emit(CountriesError(failure.message)),
       (countries) => emit(CountriesLoaded(countries)),
     );
+  }
+  
+  void _onSortCountries(
+    SortCountriesEvent event,
+    Emitter<CountriesState> emit,
+  ) {
+    if (state is! CountriesLoaded) return;
+    
+    final currentState = state as CountriesLoaded;
+    final countries = List<Country>.from(currentState.countries);
+    
+    List<Country> sortedCountries;
+    switch (event.sortType) {
+      case SortType.name:
+        sortedCountries = countries..sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case SortType.population:
+        sortedCountries = countries..sort((a, b) {
+          final aPop = a.population ?? 0;
+          final bPop = b.population ?? 0;
+          return bPop.compareTo(aPop);
+        });
+        break;
+    }
+    
+    emit(CountriesLoaded(sortedCountries, currentSort: event.sortType));
   }
 }

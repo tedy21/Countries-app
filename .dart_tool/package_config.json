@@ -170,6 +170,18 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "dio_cache_interceptor",
+      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/dio_cache_interceptor-3.5.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
+      "name": "dio_cache_interceptor_hive_store",
+      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/dio_cache_interceptor_hive_store-3.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
       "name": "dio_web_adapter",
       "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/dio_web_adapter-2.1.1",
       "packageUri": "lib/",
@@ -506,12 +518,6 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "protobuf",
-      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/protobuf-3.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
-    },
-    {
       "name": "provider",
       "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/provider-6.1.5+1",
       "packageUri": "lib/",
@@ -534,18 +540,6 @@
       "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/recase-4.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
-    },
-    {
-      "name": "retrofit",
-      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/retrofit-4.9.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.8"
-    },
-    {
-      "name": "retrofit_generator",
-      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/retrofit_generator-8.2.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
     },
     {
       "name": "shared_preferences",
@@ -674,16 +668,16 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "tuple",
-      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/tuple-2.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
       "name": "typed_data",
       "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "uuid",
+      "rootUri": "file:///home/ted-g/.pub-cache/hosted/pub.dev/uuid-4.5.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "vector_math",
